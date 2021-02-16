@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -30,16 +30,36 @@ def index():
 
 @app.route('/posts', methods=['GET', 'POST'])
 def posts():
-  if request.method == 'POST'
+  if request.method == 'POST':
     post_title = request.form['title']
     post_content = request.form['content']
-    new_post = BlogPost(title=post_title, content=post_content, author='Christine')
+    post_author = request.form["author"]
+    new_post = BlogPost(title=post_title, content=post_content, author=post_author)
     db.session.add(new_post)
-  else
+    db.session.commit()
+    return redirect('/posts')
+  else:
+    all_posts = BlogPost.query.order_by(BlogPost.date_created).all()
+    return render_template('posts.html', posts=all_posts)
 
+@app.route('/posts/delete/<int:id>')
+def delete(id):
+  post = BlogPost.query.get_or_404(id)
+  db.session.delete(post)
+  db.session.commit()
+  return redirect('/posts')
 
-  return render_template('posts.html', posts=all_posts)
-
+@app.route('/posts/update/<int:id>', methods=['GET', 'POST'])
+def update(id):
+  post = BlogPost.query.get_or_404(id)
+  if request.method == 'POST':
+    post.title = request.form['title']
+    post.content = request.form['content']
+    post.author = request.form["author"]
+    db.session.commit()
+    return redirect('/posts')
+  else:
+    return render_template('update.html', post=post)
 
 #if we are running this file in the command line, we run developer/debug mode
 #also allows for automatic updating on server

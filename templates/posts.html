@@ -13,6 +13,8 @@
   <br>
   Body: <input type="text" name="content", id="content">
   <br>
+  Author: <input type="text" name="author", id="author">
+  <br>
   <input type="submit" value="Post">
 </form>
 <hr>
@@ -26,8 +28,12 @@
     {% else %}
       <h3>By: Anonymous </h3>
     {% endif %}
-    <p>{{ post.body }}</p>
+    <p>{{ post.content }}</p>
+    <br>
+    <a href="/posts/update/{{ post.id }}">Edit</a>
+    <br>
+    <a href="/posts/delete/{{ post.id }}">Delete</a>
+    <hr>
   {% endfor %}
-
 
 {% endblock %}
